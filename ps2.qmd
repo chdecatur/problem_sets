@@ -19,7 +19,8 @@ The dataset we're using comes from the OSF Reproduciblity project replication of
 First, let's load the libraries we're going to use.
 
 ```{r}
-library(foreign) # for reading spss formatted data
+library(foreign)# for reading spss formatted data
+install.packages("foreign")
 library(tidyr)
 library(dplyr)
 library(stringr) # useful for some string manipulation
@@ -51,10 +52,18 @@ And see if you can figure out what range the likert scores are in. What's the hi
 ```{r}
 ## your code here
 
+hist(d$Game1Angry1)
+unique(d$Game1Angry1)
+range(d$Game1Angry1) #interesting, returns NA. Guess it's because range will return if any obs are missing 
+is.na(d$Game1Angry1)
+
+
+
 ```
 
-Highest number: [Your answer here]
-Lowest number: [Your answer here]
+Highest number: [1]
+Lowest number: [7]
+Other value: [NA]
 
 # cleaning up a bit
 
@@ -70,6 +79,8 @@ First, we need to `filter` out any rows that should be excluded. According to th
 
 You can see participant 23's data and the fact that they did not do part 1 by looking at the last rows of the dataframe:
 
+NOTE: there's also a duplicate of participant 23's observations. 
+
 ```{r}
 tail(d)
 ```
@@ -80,10 +91,10 @@ The researchers have made a column called `DoNotUse` based on their exclusion cr
 
 ```{r}
 filtered_d = d %>% 
-  filter(   ) # your code here: exclude subjects that are marked as "DoNotUse"
+  filter(is.na(DoNotUse)|DoNotUse != 1) # your code here: exclude subjects that are marked as "DoNotUse"
 ```
 
-It's good practice to assign a new variable name (in this case `filtered_d`) to a data frame when you change it in an important way, or apply a code chunk that shouldn't be run twice. This helps prevent you seeing different results when you run your code in chunks (and might run one multiple times, or skip it, etc.) vs. knit the document.
+It's good practice to assign a new variable name (in this case `filtered_d`) to a data frame when you change it in an important way, or apply a code chunk that shouldn't be run twice. This helps prevent you seeing different results when syou run your code in chunks (and might run one multiple times, or skip it, etc.) vs. knit the document.
 
 ## get rid of unnecessary columns
 
