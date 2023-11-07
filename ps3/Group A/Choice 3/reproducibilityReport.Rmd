@@ -116,6 +116,8 @@ dwr_summary <- dwr %>%
   ) %>%
   ungroup()
 
+kable(dwr_summary)
+
 ```
 
 ## Inferential statistics
