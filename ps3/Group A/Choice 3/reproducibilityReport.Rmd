@@ -1,5 +1,5 @@
 ---
-title: "Reproducibility Report: Group A Choice 3"
+title: "Reproducibility Report: Group A Choice 3 NOTE: completed with assistance from generative AI. I wanted to make a dataframe with actual labels instead of codeless condition markers, this would have taken me hours beyond 3- hr-limit."
 output:
   html_document:
     toc: yes
@@ -49,8 +49,8 @@ library(haven) # import and export 'SPSS', 'Stata' and 'SAS' Files
 library(readxl) # import excel files
 
 # #optional packages:
-# library(afex) #anova functions
-# library(langcog) #95 percent confidence intervals
+library(afex) #anova functions
+#library(langcog) #95 percent confidence intervals
 ```
 
 # Step 2: Load data
@@ -78,6 +78,20 @@ excluded <- "16"
 
 d <- data %>%
   filter(!Subject %in% excluded) #participant exclusions
+
+# wrangling 
+
+dwr <- d %>%
+  mutate(
+    Condition = case_when(
+      Cond == 0 & Slack == 0 & Large == 0 ~ "Time-rich, Small account",
+      Cond == 1 & Slack == 1 & Large == 0 ~ "Time-poor, Small account",
+      Cond == 2 & Slack == 0 & Large == 1 ~ "Time-rich, Large account",
+      Cond == 3 & Slack == 1 & Large == 1 ~ "Time-poor, Large account"
+    )
+  )
+
+
 ```
 
 ## Descriptive statistics
@@ -85,7 +99,22 @@ d <- data %>%
 > Time-rich participants rated the loss as more expensive when they thought about a small account (M = 8.31, 95% CI = [7.78, 8.84]) than when they thought about a large account (M = 6.50, 95% CI = [5.42, 7.58]), whereas time-poor participants’ evaluations did not differ between the small-account condition (M = 8.33, 95% CI = [7.14, 9.52]) and the large- account condition (M = 8.83, 95% CI = [7.97, 9.69]). (Shah, Shafir, & Mullainathan, 2015, p. 408)
 
 ```{r}
-# reproduce the above results here
+
+#summarise 
+dwr_summary <- dwr %>%
+  group_by(Condition) %>%
+  summarize(
+    Mean = mean(expense, na.rm = TRUE),
+    SD = sd(expense, na.rm = TRUE),
+    N = n(),
+    SEM = SD / sqrt(N),
+    CI = qt(0.975, df = N-1) * SEM
+  ) %>%
+  mutate(
+    CI_Lower = Mean - CI,
+    CI_Upper = Mean + CI
+  ) %>%
+  ungroup()
 
 ```
 
@@ -95,6 +124,8 @@ d <- data %>%
 
 ```{r}
 # reproduce the above results here
+anova_results <- aov(expense ~ Condition, data = dwr)
+summary(anova_results)
 
 ```
 
@@ -102,12 +133,10 @@ d <- data %>%
 
 Were you able to reproduce the results you attempted to reproduce? If not, what part(s) were you unable to reproduce?
 
-> ANSWER HERE
 
-How difficult was it to reproduce your results? 
+This was a step into a new way of working with R. I haven't run ANOVA before, nor have I stored descriptive statistics in a dataframe. Now that I have this code as a boiler plate, I can easily replicate the process. I understood the data structure, even though there was no coding manual for the column headers. I got  help from chatGPT, but not with identifying work flow. I used pseudocode and identified the preprocessing, descriptive, and analysis procedures on my own. I have very limited knowledge of R syntax.
 
-> ANSWER HERE
 
 What aspects made it difficult? What aspects made it easy?
 
-> ANSWER HERE
+The hardest part for me is getting code to run. I understand the underlying concepts and analyses we're trying to replicate... getting them in R is another matter.
